@@ -71,21 +71,72 @@ SELECT FLOOR(123.5678), FLOOR(23), FLOOR(-123.4567),
               CEIL(123.5678), CEIL(23), CEIL(-123.4567)
    FROM DUAL;
  
- 5. MOD(c1,n)
+ 5. MOD(n1, n2)
+  - 주어진 수 n1을 n2로 나눔 나머지 반환
+  - 자바의 '%'연산자와 동일
+  - 내부 연산방식 : 나머지=n1 - n2 * FLOOR(n1/n2)
     
+사용 예시)
+ SELECT MOD(21,5), MOD(21,8) FROM DUAL;
+ 
+사용 예시)
+키보드로 년도를 입력받아 윤년과 평년을 구별하시오
+윤년 : ( (4의 배수이면서) (100의 배수가 아니거나)) 또는 (400의 배수)가 되는 해
 
+ACCEPT P_YEAR PROMPT '년도입력 : '
+DECLARE
+    L_YEAR NUMBER := TO_NUMBER('&P_YEAR');  -- 크기를 지정하지 않으면 시스템이 알아서 지정 NUMBER(4)
+    L_RESULT VARCHAR2(500);                                
+    L_FLAG BOOLEAN := FALSE;
+BEGIN
+    L_FLAG:=(MOD(L_YEAR,4)=0 AND MOD(L_YEAR,100)!=0 ) OR MOD(L_YEAR,400)=0;
+    IF L_FLAG=FALSE THEN
+        L_RESULT:=L_YEAR||'년은 평년입니다.';
+    ELSE
+        L_RESULT:=L_YEAR||'년은 윤년입니다.';
+    END IF;
+    DBMS_OUTPUT.PUT_LINE(L_RESULT);
+END;
 
+ 6. WIDTH_BUCKET(n1, min_val, max_val, block_count)
+    - min_val에서 max_val 까지의 구간을 block_count 개수의 그룹으로 나누었을 때
+      주어진 값 n1이 그 중 어느 구간에 포함되었는지를 구간의 순번을 반환
+    - 각 구간의 범위는 '구간 하한값'<=구간<'구간 상한값' 으로 구간 상한값은 해당 구간에 포함되지 않고
+      다음 구간에 포함된다.
+    - 표현하는 구간의 수는 block_count+2개임 ('max_val'보다 큰 구간, 'min_val'미만 구간 표현)
     
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-      
+사용 예시)
+회원테이블에서 회원들의 마일리지를 조회하여 회원 등급을 부여하시오
+회원등급은 1000~8000 까지 7로 구분하고 등급명은 다음과 같다
+1 미만 : 새싹회원
+1-2 등급 :  평회원
+3-5 등급 : 열심회원
+6 이상 등급 : VIP회원
+Alias는 회원번호, 회원명, 마일리지, 등급, 회원등급명이다
+SELECT MEM_ID AS 회원번호,
+              MEM_NAME AS 회원명,
+              MEM_MILEAGE AS 마일리지,
+              WIDTH_BUCKET(MEM_MILEAGE,1000,8000,7) AS 등급,
+CASE WHEN WIDTH_BUCKET(MEM_MILEAGE,1000,8000,7)<1THEN '새싹회원'
+          WHEN WIDTH_BUCKET(MEM_MILEAGE,1000,8000,7)<3 THEN '평회원'
+          WHEN WIDTH_BUCKET(MEM_MILEAGE,1000,8000,7)<5 THEN '열심회원'
+          ELSE 'VIP회원'                                                      
+END AS 회원등급명
+        FROM MEMBER;
+
+    UPDATE MEMBER
+    SET MEM_MILEAGE = 7500
+    WHERE LOWER(MEM_ID)='s001';
+    
+    COMMIT;
+    
+사용 예시) 
+회원테이블에서 회원들의 마일리지를 조회하여 회원 등급을 부여하시오
+회원등급은 1000~8000까지 7로 구분하고 마일리지가 많은 회원부터 1 등급에서 등급값이 큰 등급을 순차적으로 부여하시오
+Alias는 회원번호, 회원명, 마일리지, 등급이다
+SELECT MEM_ID AS 회원번호,
+              MEM_NAME AS 회원명,
+              MEM_MILEAGE AS 마일리지,
+              9-WIDTH_BUCKET(MEM_MILEAGE,1000,8000,7) AS 등급
+    --        WIDTH_BUCKET(MEM_MILEAGE,8000,1000,7)+1 AS 등급
+    FROM MEMBER;
