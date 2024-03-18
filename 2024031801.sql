@@ -47,18 +47,44 @@ SELECT CAST (PROD_COST AS CHAR(20)) AS "COL1",
                                                                                  TO_CHAR(SYSDATE,'YYYY-MM-DD DY'),
                                                                                  TO_CHAR(SYSDATE,'YYYY-MM-DD D')
                                                                        FROM DUAL;
-      AM, A.M.             오전                           SELECT TO_CHAR(SYSDATE,'YYYY-MM-DD AM HH24:MI:SS'),
+      AM, A.M.             오전/오후                   SELECT TO_CHAR(SYSDATE,'YYYY-MM-DD AM HH24:MI:SS'),
                                                                                 TO_CHAR(SYSDATE,'YYYY-MM-DD PM HH24:MI:SS')
                                                                         FROM DUAL;
-      PM, P.M.             오후
+      PM, P.M.           
       HH,HH12,HH24     시간
       MI                        분
-      SS,SSSSS           초                              SELECT TO_CHAR(SYSDATE,'YYYY-MM-DD AM HH24:MI:SS'),
-                                                                                TO_CHAR(SYSDATE,'YYYY-MM-DD AM HH24:MI:SSSSS')
-                                                                        FROM DUAL;
-      
-      SELECT TO_CHAR(SYSDATE, 'SSSSS')
-    FROM DUAL;
-      
+      SS,SSSSS           초                                  SELECT TO_CHAR(SYSDATE,'YYYY-MM-DD AM HH24:MI:SS'),
+                                                                                     TO_CHAR(SYSDATE,'YYYY-MM-DD AM HH24:MI:SSSSS')
+                                                                         FROM DUAL;
+2) 숫자형 형식지정 문자열
+ ----------------------------------------------------------------------------------------------
+         형식문자열                 의미/사용예                                                                            
+ ----------------------------------------------------------------------------------------------     
+             9                대응되는 자료가 유효 숫자이면 해당되는 자료 출력,
+                               0이면 공백 출력(단, 소숫점이하 경우에는 '0'출력)
+                               SELECT TO_CHAR(234, '9,999'),
+                                            TO_CHAR(234.267, '9,999.99'),
+                                            TO_CHAR(234, '999.99')
+                                FROM DUAL;
+             0               대응되는 자료가 유효숫자이면 해단되는 자료 출력,
+                              0이면 0 출력 소숫점 이하인 경우에도 '0' 출력)
+                              SELECT TO_CHAR(234, '0,000'),
+                                            TO_CHAR(234.267, '0,000.00'),
+                                            TO_CHAR(234, '000.99')
+                                FROM DUAL;
+            PR              주어진 숫자가 음수인 경우 '<>' 안에 출력
+                               SELECT TO_CHAR(234, '9,999PR'),
+                                            TO_CHAR(-234.267, '9,999.99PR'),
+                                            TO_CHAR(-234, '999.99PR')
+                                FROM DUAL;
+             L($)           데이터 왼쪽에 화폐기호 출력(L은 지역화폐)
+                                SELECT TO_CHAR(678234, 'L999,999'),
+                                            TO_CHAR(234.267, '$9,999.99'),
+                                            TO_CHAR(234, 'L999999.99')
+                                FROM DUAL;
+         , (COMMA)      데이터 3자리마다 ',' (자리점) 출력
+          . (DOT)           소숫점 표현
+                
+                
 3. TO_DATE(), (날짜타입으로 변환)
 4. TO_NUMBER() (숫자타입으로 변환)
