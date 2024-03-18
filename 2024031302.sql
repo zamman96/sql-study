@@ -7,12 +7,11 @@ Null처리 함수
 집계 함수
 순위 함수
 
-
 1. 문자열 함수
 
 CONCAT (문자열 결합)
 LOWER(), UPPER(), INITCAP() (소문자, 대문자, 첫 글자만 변환)
-LPAD() (주어진 문자열의 크기만큼 지정된 문자를 채워넣기)
+LPAD() RPAD() (주어진 문자열의 크기만큼 지정된 문자를 채워넣기)
 LTRIM(), RTRIM() (왼쪽, 오른쪽의 공백을 제거)
 TRIM() (양 옆에 존재하는 무효의 공백을 제거)
 SUBSTR() (문자열을 지정된 만큼 자름)
@@ -34,6 +33,7 @@ SYSDATE, ADD_MONTHS() (시스템시간 반환, 주어진 날짜에 ADD한 만큼
 NEXT_DAT, LAST_DAY (주어진 날짜 이후 가장 빠른 요일을 반환, 가장 마지막날을 반환)
 MONTHS_BETWEEN() (두 날짜자료 사이의 달수를 반환)
 EXTRACT() (주어진 날짜에서 원하는 부분만 출력)
+ROUND(), TRUNC() (반올림, 올림)
 
 4. 변환함수
 
@@ -44,7 +44,7 @@ TO_NUMBER() (숫자타입으로 변환)
 
 5. NULL처리 함수
 
-IS NULL, IN NOT NULL (NULL인지 여부 판단)
+IS NULL, IS NOT NULL (NULL인지 여부 판단)
 NVL() (NULL이면 VAL을 반환하고 아니면 자신의 값을 반환)
 NVL2() (NULL이면 VAL2을 아니면 VAL1을 반환)
 NULLIF() (둘을 비교하여 같으면 NULL 아니면 첫 번째 값 반환)
