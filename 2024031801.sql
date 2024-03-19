@@ -78,13 +78,44 @@ SELECT CAST (PROD_COST AS CHAR(20)) AS "COL1",
                                             TO_CHAR(-234, '999.99PR')
                                 FROM DUAL;
              L($)           데이터 왼쪽에 화폐기호 출력(L은 지역화폐)
-                                SELECT TO_CHAR(678234, 'L999,999'),
+                                SELECT TO_CHAR(6782, 'L999,999'),
                                             TO_CHAR(234.267, '$9,999.99'),
-                                            TO_CHAR(234, 'L999999.99')
+                                            TO_CHAR(234000, 'L999999.99')
                                 FROM DUAL;
          , (COMMA)      데이터 3자리마다 ',' (자리점) 출력
           . (DOT)           소숫점 표현
                 
-                
-3. TO_DATE(), (날짜타입으로 변환)
-4. TO_NUMBER() (숫자타입으로 변환)
+3. TO_DATE(data [,fmt])
+    - 날짜 형식의 문자열 date와 숫자 data를 기본 날짜형으로 변환
+    - fmt는 date가 기본 날짜형으로 자동 변환될 수 없는 편집된 자료인 경우
+      해당 data가 출력(편집)에 사용된 형식 문자열을 기술
+    - 날짜 타입 형식 문자열은 TO_CHAR과 동일 
+
+사용 예시)
+    SELECT TO_DATE('20200201'),
+     --           TO_DATE('20200201 오후 13:23:35'),
+    --            TO_DATE('2020년03월19일'),   
+                  TO_DATE('2020/02/01'),
+                  TO_DATE('2020-02-01'),
+                  TO_DATE('2020 02 01')
+        FROM DUAL;
+
+    SELECT TO_DATE('20200201 오후 3:11:11', 'YYYYMMDD PM HH:MI:SS'),
+                  TO_DATE('2020년03월19일','YYYY"년"MM"월"DD"일"')
+        FROM DUAL;
+
+4. TO_NUMBER(data [,fmt])
+    - 숫자 형식의 문자열 데이터를 기본 숫자형으로 변환
+    - fmt는 date가 기본 숫자형으로 자동 변환될 수 없는 편집된 자료인 경우
+      해당 data가 출력(편집)에 사용된 형식 문자열을 기술
+    - 숫자 타입 형식 문자열은 TO_CHAR과 동일 
+
+사용 예시)
+SELECT TO_NUMBER('230.89'),
+               TO_NUMBER('-1234')
+     FROM DUAL;
+     
+SELECT TO_NUMBER('<12,567>','99,999PR'),
+              TO_NUMBER('123,567.00', '999,999.99'),
+              TO_NUMBER('￦2,300','L9,999')   
+     FROM DUAL;
