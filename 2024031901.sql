@@ -70,7 +70,8 @@ SELECT EMPLOYEE_ID AS 사원번호,
 Alias는 회원번호, 회원명, 비고
 SELECT MEM_ID AS 회원번호,
               MEM_NAME AS 회원명,
-              NVL(TO_CHAR(MEM_MILEAGE,'99,999'),'휴면회원') AS 비고
+             NVL(TO_CHAR(MEM_MILEAGE,'99,999'),'휴면회원') AS 비고
+--              NVL2(MEM_MILEAGE,TO_CHAR(MEM_MILEAGE,'99,999'),'휴면회원') AS 비고
     FROM MEMBER;
 
 사용예시)
@@ -88,7 +89,8 @@ SELECT A.MEM_ID AS 회원번호,
                                     WHERE B.CART_PROD=C.PROD_ID
                                           AND B.CART_NO LIKE '202005%'
                                     GROUP BY B.CART_MEMBER)   D                             
-    WHERE A.MEM_ID=D.CID(+);
+    WHERE A.MEM_ID=D.CID (+);
+    -- OUTER JOIN (+) 아우터 조인 (외부조인)
 
 3. NVL2(col, value1, value2)
     - 'col'값이 NULL이면 'value2'를 반환하고, NULL이 아니면 'value1'을 반환
@@ -121,5 +123,5 @@ Alias는  상품코드, 상품명, 매입가, 매출가
 SELECT PROD_ID AS 상품코드,
               PROD_NAME AS 상품명,
               PROD_COST AS 매입가,
-              NVL(TO_CHAR(NULLIF(PROD_PRICE,PROD_COST),'999,999,999'),'단종예정상품') AS 매출가
+              LPAD(NVL(TO_CHAR(NULLIF(PROD_PRICE,PROD_COST)),'단종예정상품'),LENGTHB('단종예정상품')) AS 매출가
 FROM PROD
