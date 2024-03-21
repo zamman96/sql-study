@@ -127,19 +127,38 @@ GROUP BY CASE WHEN SUBSTR(MEM_REGNO2,1,1) IN('1','3') THEN '남성'
 
 사용 예시)
 2020년 4-7월 회원별 평균 구매횟수를 조회하시오.
--- 회원별 구매횟수
-SELECT CART_MEMBER AS 회원,
-              COUNT(*) AS 구매횟수
-FROM CART
-WHERE SUBSTR(CART_NO,1,6) BETWEEN '202004' AND '202007'
-GROUP BY CART_MEMBER;
+--          회원별 구매횟수 (같은 날에 산 것도 포함이되어서 틀린자료)
+--SELECT CART_MEMBER AS 회원,
+--              COUNT(*) AS 구매횟수
+--FROM CART
+--WHERE SUBSTR(CART_NO,1,6) BETWEEN '202004' AND '202007'
+--GROUP BY CART_MEMBER
+--ORDER BY 1;
 -- 전체 회원의 평균 구매횟수
-SELECT AVG(COUNT) AS 평균구매횟수
-   FROM (SELECT CART_MEMBER AS 회원,
-                             COUNT(*) AS COUNT
-                   FROM CART
-                WHERE SUBSTR(CART_NO,1,6) BETWEEN '202004' AND '202007'
-                 GROUP BY CART_MEMBER);
+--SELECT AVG(COUNT) AS 평균구매횟수
+--   FROM (SELECT CART_MEMBER AS 회원,
+--                             COUNT(*) AS COUNT
+--                   FROM CART
+--                WHERE SUBSTR(CART_NO,1,6) BETWEEN '202004' AND '202007'
+--                 GROUP BY CART_MEMBER);
+
+-- CART_NO가 같은걸 묶고나서 COUNT 작업을 해야함 
+SELECT A.CART_MEMBER AS 회원번호,
+              COUNT(*) AS 구매횟수
+FROM( SELECT CART_MEMBER, CART_NO, COUNT(*)
+              FROM CART
+          WHERE SUBSTR(CART_NO,1,6) BETWEEN '202004' AND '202007'
+            GROUP BY CART_MEMBER, CART_NO
+             ORDER BY 1) A
+GROUP BY A.CART_MEMBER
+ORDER BY 1;
+
+
+SELECT CART_MEMBER, CART_NO
+FROM CART
+WHERE CART_MEMBER='a001';
+
+
 
 사용 예시) 
 2020년 5월 회원별 구매금액 합계를 구하여 출력하되 
