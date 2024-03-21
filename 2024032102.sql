@@ -35,6 +35,28 @@
                                                 :
     [ WHERE 일반조건]
     
+ 1) CARTESIAN JOIN (CROSS JOIN)
+  - 조인조건이 생략되었거나 잘못된 조인조건이 부여된 경우
+  - 결과는 두 테이블의 행은 곱한 갯수와 열은 더한 결과를 반환
+  - 반드시 필요한 경우가 아니면 수행 자제
+(ANSI FORMAT)
+    SELECT column_list
+        FROM table_name
+    CROSS JOIN table_name [ON join_condition] ;
+    
+사용 예시)
+SELECT COUNT(*)
+    FROM BUYPROD, PROD, CART;
+    
+SELECT COUNT(*)
+    FROM BUYPROD
+    CROSS JOIN PROD
+    CROSS JOIN CART;
+    
+    
+
+
+    
     
     
     
