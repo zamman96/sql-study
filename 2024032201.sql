@@ -222,4 +222,65 @@ SELECT L.LPROD_GU AS 상품번호,
                                             AND EXTRACT(YEAR FROM B.BUY_DATE)=2020)
   GROUP BY L.LPROD_GU, L.LPROD_NM
   ORDER BY 1;
+  
+  
+  2020년 4월 모든 상품별 매입/매출 집계를 조회하시오
+  Alias는 상품번호, 상품명, 매입수량, 매입금액, 매출수량, 매출금액
+일반
+  SELECT A.PROD_ID AS 상품번호,
+                A.PROD_NAME AS 상품명,
+                SUM(B.BUY_QTY) AS 매입수량,
+                SUM(B.BUY_QTY*A.PROD_COST) AS 매입금액,
+               SUM(C.CART_QTY) AS 매출수량,
+               SUM(C.CART_QTY*A.PROD_PRICE) AS 매출금액
+    FROM PROD A, BUYPROD B, CART C
+WHERE A.PROD_ID=B.BUY_PROD (+)
+      AND A.PROD_ID=C.CART_PROD (+)
+      AND B.BUY_DATE BETWEEN TO_DATE('20200401') AND LAST_DAY(TO_DATE('20200401'))
+      AND SUBSTR(C.CART_NO,1,6)='202004'
+GROUP BY A.PROD_ID, A.PROD_NAME
+ORDER BY 1;
+
+(서브쿼리)
+  SELECT A.PROD_ID AS 상품번호,
+                A.PROD_NAME AS 상품명,
+                NVL(B.BQTY,0) AS 매입수량,
+                NVL(B.BSUM,0) AS 매입금액,
+                NVL(C.CQTY,0) AS 매출수량,
+                NVL(C.CSUM,0) AS 매출금액
+    FROM PROD A, (SELECT A.PROD_ID AS BID,
+                                            SUM(B.BUY_QTY) AS BQTY,
+                                            SUM(B.BUY_QTY*A.PROD_COST) AS BSUM
+                                  FROM PROD A, BUYPROD B      
+                               WHERE A.PROD_ID=B.BUY_PROD 
+                                    AND B.BUY_DATE BETWEEN TO_DATE('20200401') AND LAST_DAY(TO_DATE('20200401'))
+                                GROUP BY A.PROD_ID ) B,
+                                ( SELECT A.PROD_ID AS CID,
+                                               SUM(C.CART_QTY) AS CQTY,
+                                               SUM(C.CART_QTY*A.PROD_PRICE) AS CSUM
+                                    FROM PROD A, CART C     
+                                WHERE A.PROD_ID=C.CART_PROD
+                                    AND SUBSTR(C.CART_NO,1,6)='202004'
+                                GROUP BY A.PROD_ID) C
+ WHERE A.PROD_ID=BID(+)
+ AND A.PROD_ID=CID(+)
+ ORDER BY 1;
+
+(ANSI)
+  SELECT A.PROD_ID AS 상품번호,
+                A.PROD_NAME AS 상품명,
+                NVL(SUM(B.BUY_QTY),0) AS 매입수량,
+                NVL(SUM(B.BUY_QTY*A.PROD_COST),0) AS 매입금액,
+                NVL(SUM(C.CART_QTY),0) AS 매출수량,
+                NVL(SUM(C.CART_QTY*A.PROD_PRICE),0) AS 매출금액
+    FROM PROD A
+    LEFT OUTER JOIN BUYPROD B ON(A.PROD_ID=B.BUY_PROD
+                                                       AND B.BUY_DATE BETWEEN TO_DATE('20200401') 
+                                                       AND LAST_DAY(TO_DATE('20200401')))
+    LEFT OUTER JOIN CART C ON(A.PROD_ID=C.CART_PROD
+                                                AND SUBSTR(C.CART_NO,1,6)='202004')    
+GROUP BY A.PROD_ID, A.PROD_NAME
+ORDER BY 1;
+  
+  
     
