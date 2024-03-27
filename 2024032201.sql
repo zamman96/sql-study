@@ -281,6 +281,8 @@ ORDER BY 1;
                                                 AND SUBSTR(C.CART_NO,1,6)='202004')    
 GROUP BY A.PROD_ID, A.PROD_NAME
 ORDER BY 1;
+
+
   
   
     
