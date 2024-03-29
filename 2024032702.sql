@@ -61,6 +61,152 @@
  SELECT JOB_ID,SALARY
     FROM HR.EMPLOYEES
   WHERE SALARY BETWEEN 5000 AND 6000;
+  
+  
+사용 예시)
+상품테이블에서 분류코드 'P201'에 속한 판매가격이 30000~50000사이의 상품과
+판매가격이 30000 이상인 상품들을 조회하시오
+ Alias는 상품코드, 상품명, 분류코드, 판매가격이며 판매가격이 큰 상품부터 출력하시오
+ 
+ SELECT PROD_ID AS 상품코드,
+                PROD_NAME AS 상품명,
+                PROD_LGU AS 분류코드,
+                PROD_PRICE AS 판매가격
+ FROM PROD
+ WHERE UPPER(PROD_LGU)='P201'
+ AND PROD_PRICE BETWEEN 30000 AND 50000
+ UNION
+  SELECT PROD_ID AS 상품코드,
+                PROD_NAME AS 상품명,
+                PROD_LGU AS 분류코드,
+                PROD_PRICE AS 판매가격
+ FROM PROD
+ WHERE PROD_PRICE>=30000
+ORDER BY 4 DESC;
+
+사용 예시) 2022년 계획대비 판매실적을 조회하시오
+SELECT PERIOD AS 년월,
+              BUDGET_AMT AS 계획,
+              0 AS 실적
+    FROM BUDGET_TBL
+UNION
+SELECT PERIOD, 0, SALE_AMT
+FROM SALE_TBL
+ORDER BY 1, 2 DESC;
+
+SELECT A.PER AS 기간,
+              SUM(A.BUDGET) AS 계획,
+              SUM(A.SALE) AS 실적,
+              LPAD(ROUND(SUM(A.SALE)/SUM(A.BUDGET)*100)||'%',6,' ') AS 달성율
+    FROM ( SELECT PERIOD AS PER, 
+                                BUDGET_AMT AS BUDGET, 0 AS SALE
+                     FROM BUDGET_TBL
+                UNION
+                  SELECT PERIOD, 0, SALE_AMT 
+                     FROM SALE_TBL ) A
+GROUP BY A.PER
+ORDER BY 1;
+
+2. INTERSECT
+    - 교집합(공통부분)의 결과를 반환함
+    
+사용 예시) 2020년 5월 매입과 판매가 모두 발생된 상품을 조회하시오.
+상품코드, 상품명, 매입가
+
+SELECT A.BUY_PROD AS 상품코드,
+              B.PROD_NAME AS 상품명,
+              B.PROD_COST AS 매입가
+FROM BUYPROD A, PROD B
+WHERE A.BUY_DATE BETWEEN TO_DATE('20200501') AND TO_DATE('20200531')
+AND A.BUY_PROD=B.PROD_ID
+INTERSECT
+SELECT A.CART_PROD,
+              B.PROD_NAME,
+              B.PROD_PRICE
+FROM CART A, PROD B
+WHERE SUBSTR(CART_NO,1,6)='202005'
+AND A.CART_PROD=B.PROD_ID
+-- 내용까지 같아야 하나로 취급
+
+사용 예시 ) 2020년 5월 6월 7월에 구매한 회원을 조회하시오
+SELECT A.CART_MEMBER AS 회원번호,
+              B.MEM_NAME AS 이름
+FROM CART A, MEMBER B
+WHERE A.CART_MEMBER=B.MEM_ID
+AND SUBSTR(CART_NO,1,6)='202005'
+INTERSECT
+SELECT A.CART_MEMBER AS 회원번호,
+              B.MEM_NAME AS 이름
+FROM CART A, MEMBER B
+WHERE A.CART_MEMBER=B.MEM_ID
+AND SUBSTR(CART_NO,1,6)='202006'
+INTERSECT
+SELECT A.CART_MEMBER AS 회원번호,
+              B.MEM_NAME AS 이름
+FROM CART A, MEMBER B
+WHERE A.CART_MEMBER=B.MEM_ID
+AND SUBSTR(CART_NO,1,6)='202007'
+
+
+(조인)
+SELECT DISTINCT D.MEM_ID,
+                              D.MEM_NAME
+FROM (SELECT CART_MEMBER
+                FROM CART
+             WHERE SUBSTR(CART_NO,1,6)='202005') A,
+          (SELECT CART_MEMBER
+              FROM CART
+            WHERE SUBSTR(CART_NO,1,6)='202006') B,
+         (SELECT CART_MEMBER
+              FROM CART
+            WHERE SUBSTR(CART_NO,1,6)='202007') C, MEMBER D
+WHERE D.MEM_ID=A.CART_MEMBER
+      AND D.MEM_ID=B.CART_MEMBER
+      AND D.MEM_ID=C.CART_MEMBER
+      
+ 3. MINUS 연산자
+ - 차집합의 결과를 반환
+ (사용형식)
+ A MINUS B : A의 원소 중 B의 원소를 제거한 값
+ B MINUS A : B의 원소 중 A의 원소를 제거한 값
+
+사용 예시)
+2020년 6월에는 판매되었지만 2020년 7월에는 판매되지 않은 상품 조회
+SELECT DISTINCT A.CART_PROD AS 상품번호,
+              B.PROD_NAME AS 상품명
+FROM CART A, PROD B
+WHERE A.CART_PROD=B.PROD_ID
+AND SUBSTR(CART_NO,1,6)='202006'
+AND A.CART_PROD NOT IN(SELECT DISTINCT CART_PROD
+                                                FROM CART
+                                             WHERE SUBSTR(CART_NO,1,6)='202007');
+ 
+SELECT C.CID
+    FROM ( SELECT B.CART_PROD AS CID
+                    FROM (SELECT DISTINCT CART_PROD
+                                    FROM CART
+                                    WHERE CART_NO LIKE '202006%'
+                                     ORDER BY 1) B
+                WHERE B.CART_PROD NOT IN (SELECT DISTINCT CART_PROD
+                                                                     FROM CART
+                                                                    WHERE CART_NO LIKE '202007%')) C
+ ORDER BY 1;
+
+
+SELECT A.CART_PROD AS 상품번호,
+              B.PROD_NAME AS 상품명
+FROM CART A, PROD B
+WHERE A.CART_PROD=B.PROD_ID
+AND SUBSTR(CART_NO,1,6)='202006'
+MINUS
+SELECT A.CART_PROD AS 상품번호,
+              B.PROD_NAME AS 이름
+FROM CART A, PROD B
+WHERE A.CART_PROD=B.PROD_ID
+AND SUBSTR(CART_NO,1,6)='202007'
+
+    
+              
             
             
             
